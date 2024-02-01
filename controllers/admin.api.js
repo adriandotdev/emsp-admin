@@ -1,4 +1,4 @@
-const { validationResult, body } = require("express-validator");
+const { validationResult, body, param } = require("express-validator");
 // Service
 const UserService = require("../services/AdminService");
 
@@ -24,36 +24,42 @@ module.exports = (app) => {
 		}
 	}
 
-	app.get(
-		"/emsp/admin/approve/:country_code/:party_id",
-		[],
-		async (req, res) => {
-			logger.info({ GET_ADMIN: { message: "Request" } });
+	app.patch("/emsp/admin/approve/:cpo_id", async (req, res) => {
+		const { country_code, cpo_id } = req.params;
 
-			try {
-				validate(req, res);
+		logger.info({
+			APPROVE_CPO_API_REQUEST: { message: { country_code, cpo_id } },
+		});
 
-				logger.info({ GET_USERS_API_RESPONSE: { status: 200 } });
+		try {
+			validate(req, res);
 
-				return res.status(200).json({ status: 200, data: [] });
-			} catch (err) {
-				if (err !== null) {
-					logger.error({ GET_USERS_API_ERROR: { message: err.message } });
+			await service.ApproveChargingPointOperator(cpo_id);
 
-					return res
-						.status(err.status)
-						.json({ status: err.status, data: err.data, message: err.message });
-				}
+			logger.info({
+				APPROVE_CPO_API_RESPONSE: { status: 200, message: "APPROVED" },
+			});
 
-				logger.error({
-					GET_USERS_API_ERROR: {
-						message: "Internal Server Error",
-					},
+			return res.status(200).json({ status: 200, data: [] });
+		} catch (err) {
+			if (err !== null) {
+				logger.error({ APPROVE_CPO_API_ERROR: { message: err.message } });
+
+				return res.status(err.status ? err.status : 500).json({
+					status: err.status ? err.status : 500,
+					data: err.data,
+					message: err.message,
 				});
-				return res
-					.status(500)
-					.json({ status: 500, data: [], message: "Internal Server Error" });
 			}
+
+			logger.error({
+				APPROVE_CPO_API_ERROR: {
+					message: "Internal Server Error",
+				},
+			});
+			return res
+				.status(500)
+				.json({ status: 500, data: [], message: "Internal Server Error" });
 		}
-	);
+	});
 };
