@@ -1,5 +1,9 @@
 const AdminRepository = require("../repository/AdminRepository");
+
+// Utils
 const Crypto = require("../utils/Crypto");
+const SendCPODetails = require("../utils/Email/SendCPODetails");
+const { HttpBadRequest } = require("../utils/HttpError");
 
 module.exports = class AdminService {
 	#repository;
@@ -58,8 +62,26 @@ module.exports = class AdminService {
 	async ApproveChargingPointOperator(cpoID) {
 		const res = await this.#repository.GetCPO(cpoID);
 
-		const partyID = await this.#GeneratePartyID(res.result[0].cpo_name);
-		const tokenA = this.#GenerateTokenA(res.result[0].country_code, partyID);
+		// Check if CPO is found
+		if (res.result.length === 0) {
+			throw new HttpBadRequest("CPO ID does not exists", []);
+		}
+
+		// Extract necessary data.
+		const cpoName = res.result[0].cpo_name;
+		const countryCode = res.result[0].country_code;
+		const status = res.result[0].status;
+
+		if (status === "APPROVED") {
+			throw new HttpBadRequest("CPO already approved", []);
+		}
+
+		const partyID = await this.#GeneratePartyID(cpoName);
+		const tokenA = this.#GenerateTokenA(countryCode, partyID);
+
+		const emsp_versions = await this.#repository.GetEMSPSupportedVersions(
+			res.connection
+		);
 
 		await this.#repository.ApproveChargingPointOperator({
 			party_id: partyID,
@@ -67,6 +89,15 @@ module.exports = class AdminService {
 			cpo_id: cpoID,
 			connection: res.connection,
 		});
+
+		const emailSender = new SendCPODetails(res.result[0].contact_email, {
+			party_id: partyID,
+			country_code: countryCode,
+			token: tokenA,
+			emsp_versions,
+		});
+
+		await emailSender.SendEmail();
 
 		return {
 			partyID,

@@ -15,7 +15,7 @@ module.exports = class AdminRepository {
 	}
 
 	GetCPO(cpo_id) {
-		const query = `SELECT country_code, cpo_name FROM cpos WHERE cpo_id = ?`;
+		const query = `SELECT country_code, cpo_name, contact_email, status FROM cpos WHERE cpo_id = ?`;
 
 		return new Promise((resolve, reject) => {
 			mysql.getConnection((err, connection) => {
@@ -32,6 +32,20 @@ module.exports = class AdminRepository {
 
 					resolve({ result, connection });
 				});
+			});
+		});
+	}
+
+	GetEMSPSupportedVersions(connection) {
+		const query = `SELECT version, url FROM emsp_versions`;
+
+		return new Promise((resolve, reject) => {
+			connection.query(query, (err, result) => {
+				if (err) {
+					reject(err);
+				}
+
+				resolve(result);
 			});
 		});
 	}

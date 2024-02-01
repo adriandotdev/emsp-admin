@@ -24,6 +24,7 @@ module.exports = (app) => {
 		}
 	}
 
+	// Admin approval API
 	app.patch("/emsp/admin/approve/:cpo_id", async (req, res) => {
 		const { country_code, cpo_id } = req.params;
 

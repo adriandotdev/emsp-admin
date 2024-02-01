@@ -18,10 +18,13 @@ module.exports = class SendCPODetails extends Email {
 			  <h1>Welcome to ParkNcharge</h1>
 	
 			  <h2>The information below is blah blah blah</h2>
-			  <p>PARTY ID: ${this.GetData().party_id}</p>
-			  <p>COUNTRY CODE: ${this.GetData().country_code}</p>
-              <p>TOKEN: ${this.GetData().token}</p>
-
+			  <p><b>PARTY ID:</b> ${this.GetData().party_id}</p>
+			  <p><b>COUNTRY CODE:</b> ${this.GetData().country_code}</p>
+              <p><b>TOKEN:</b> ${this.GetData().token}</p>
+              <p><b>Versions URL:</b> ${this.GetData().emsp_versions[0].url}</p>
+              <p><b>Version Endpoints URL: </b>${
+								this.GetData().emsp_versions[0].url
+							}/:version_number</p>
 			  <p>Kind regards,</p>
 			  <p><b>ParkNcharge</b></p>
 			`;
@@ -29,7 +32,7 @@ module.exports = class SendCPODetails extends Email {
 			let textFormat = `ParkNcharge\n\nPLEASE DO NOT SHARE THIS OTP TO ANYONE\n\nKind regards,\nParkNCharge`;
 			// send mail with defined transport object
 			const info = await this.GetTransporter().sendMail({
-				from: process.env.NODEMAILER_USER, // sender address
+				from: config.nodemailer.user, // sender address
 				to: this.GetEmail(), // list of receivers
 				subject: "ParkNcharge Credentials (no-reply)", // Subject line
 				text: textFormat, // plain text body
