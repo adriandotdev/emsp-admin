@@ -1,6 +1,6 @@
 const { validationResult, body, param } = require("express-validator");
 // Service
-const UserService = require("../services/AdminService");
+const AdminService = require("../services/AdminService");
 
 // Http Errors
 const { HttpUnprocessableEntity } = require("../utils/HttpError");
@@ -9,7 +9,7 @@ const { HttpUnprocessableEntity } = require("../utils/HttpError");
 const logger = require("../config/winston");
 
 module.exports = (app) => {
-	const service = new UserService();
+	const service = new AdminService();
 	/**
 	 * This function will be used by the express-validator for input validation,
 	 * and to be attached to APIs middleware. */

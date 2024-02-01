@@ -24,4 +24,5 @@ app.use(morgan("combined", { stream: winston.stream }));
 app.use(cookieParser());
 
 require("./controllers/admin.api")(app);
+require("./controllers/admin_auth.api")(app);
 module.exports = app;
