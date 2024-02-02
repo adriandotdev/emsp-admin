@@ -64,6 +64,7 @@ module.exports = class AdminService {
 
 		// Check if CPO is found
 		if (res.result.length === 0) {
+			res.connection.release();
 			throw new HttpBadRequest("CPO ID does not exists", []);
 		}
 
@@ -73,6 +74,7 @@ module.exports = class AdminService {
 		const status = res.result[0].status;
 
 		if (status === "APPROVED") {
+			res.connection.release();
 			throw new HttpBadRequest("CPO already approved", []);
 		}
 
