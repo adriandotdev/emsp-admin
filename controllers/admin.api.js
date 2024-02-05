@@ -45,7 +45,7 @@ module.exports = (app) => {
 		} catch (err) {
 			if (err !== null) {
 				logger.error({ APPROVE_CPO_API_ERROR: { message: err.message } });
-
+				console.log(err);
 				return res.status(err.status ? err.status : 500).json({
 					status: err.status ? err.status : 500,
 					data: err.data,
@@ -58,6 +58,7 @@ module.exports = (app) => {
 					message: "Internal Server Error",
 				},
 			});
+			console.log(err);
 			return res
 				.status(500)
 				.json({ status: 500, data: [], message: "Internal Server Error" });
