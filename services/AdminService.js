@@ -1,3 +1,4 @@
+require("dotenv").config();
 const AdminRepository = require("../repository/AdminRepository");
 
 // Utils
@@ -53,7 +54,9 @@ module.exports = class AdminService {
 			JSON.stringify({
 				country_code: countryCode,
 				party_id: partyID,
-			})
+			}),
+			process.env.CREDENTIAL_TOKEN_A_SECRET_KEY,
+			process.env.CREDENTIAL_TOKEN_A_IV
 		);
 
 		return tokenA;
